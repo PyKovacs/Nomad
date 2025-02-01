@@ -8,8 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
-
+venv
 # Object Detection model
 *.pt
 
 .env
+
+test.png
