@@ -14,4 +14,4 @@ venv
 
 .env
 
-test.png
+test*.png
