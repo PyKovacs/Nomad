@@ -1,4 +1,5 @@
 from enum import Enum
+from time import sleep
 
 from log_config import get_logger
 from modules import capture, detect, notify
@@ -8,6 +9,7 @@ logger = get_logger(__name__)
 
 FILE_PATH = "snapshots/current.png"
 OD_MODEL = YOLO("models/yolov8n.pt")
+DETECTION_DELAY_SECONDS = 0
 
 
 class DetectionType(Enum):
@@ -20,10 +22,15 @@ def main():
     previous_detected_objects_count = 0
     while True:
         capture.capture_frame(FILE_PATH)
-        detected_objects_count = detect.detect_objects(FILE_PATH, OD_MODEL, active_detection_type.value)
+        detected_objects_count = detect.detect_objects(
+            FILE_PATH, OD_MODEL, active_detection_type.value
+        )
         if detected_objects_count != previous_detected_objects_count:
-            notify.send_notification(detected_objects_count, active_detection_type.name, FILE_PATH)
+            notify.send_notification(
+                detected_objects_count, active_detection_type.name, FILE_PATH
+            )
         previous_detected_objects_count = detected_objects_count
+        sleep(DETECTION_DELAY_SECONDS)
 
 
 if __name__ == "__main__":
