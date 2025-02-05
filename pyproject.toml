@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "opencv-python>=4.11.0.86",
+    "ffmpeg-python>=0.2.0",
     "pydantic-settings>=2.7.1",
     "python-telegram-bot>=21.10",
     "ultralytics>=8.3.70",

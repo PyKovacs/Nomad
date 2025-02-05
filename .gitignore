@@ -15,3 +15,8 @@ venv
 .env
 
 test*.png
+*.log
+
+
+app/snapshots/*.png
+app/models/*
