@@ -1,4 +1,7 @@
+from log_config import get_logger
 from ultralytics import YOLO
+
+logger = get_logger(__name__)
 
 
 def detect_objects(snapshot_filename: str, model: YOLO, object_class: int) -> int:
@@ -7,8 +10,9 @@ def detect_objects(snapshot_filename: str, model: YOLO, object_class: int) -> in
 
     object_class: 2 for cars
     """
+    logger.info(f"Detecting objects in {snapshot_filename}")
     results = model(snapshot_filename)  # YOLO inference
     detections = results[0].boxes
     detected_objects_count = len([obj for obj in detections if obj.cls == object_class])
-    print(f"{detected_objects_count} object(s) detected")
+    logger.info(f"{detected_objects_count} object(s) detected")
     return detected_objects_count

@@ -1,20 +1,20 @@
+import os
 from logging import Formatter, Logger, handlers
 
+LOG_FILE = "logs/nomad.log"
 
-def get_logger(name: str) -> Logger:
+
+def get_logger(name: str, log_level: str = "INFO") -> Logger:
     """
     Get a logger with the specified name.
     """
-    ### specify the logger message format to be "NAME: TIME - LEVEL - MESSAGE"
-    ### specify the logger date format to be "%d-%m-%Y %H:%M:%S"
     formatter = Formatter(f"{name}: %(asctime)s - %(levelname)s - %(message)s", "%d-%m-%Y %H:%M:%S")
-
-    ### create a logger
     logger = Logger(name)
 
     ### create a handler
-    handler = handlers.TimedRotatingFileHandler("nomad.log", when="midnight", backupCount=30)
-    handler.setLevel("DEBUG")
+    os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
+    handler = handlers.TimedRotatingFileHandler(LOG_FILE, when="midnight", backupCount=30)
+    handler.setLevel(log_level)
 
     ### create a formatter
     handler.setFormatter(formatter)

@@ -1,6 +1,9 @@
 from functools import cache
 
+from log_config import get_logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = get_logger(__name__)
 
 
 class TelegramBotSettings(BaseSettings):
@@ -18,9 +21,11 @@ class RTSPSettings(BaseSettings):
 
 @cache
 def get_telegram_bot_settings() -> TelegramBotSettings:
+    logger.info("Loading Telegram bot settings")
     return TelegramBotSettings()
 
 
 @cache
 def get_rtsp_settings() -> RTSPSettings:
+    logger.info("Loading RTSP settings")
     return RTSPSettings()
