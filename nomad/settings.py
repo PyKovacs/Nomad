@@ -1,7 +1,8 @@
 from functools import cache
 
-from log_config import get_logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from nomad.log_config import get_logger
 
 logger = get_logger(__name__)
 

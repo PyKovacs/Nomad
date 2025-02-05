@@ -1,8 +1,9 @@
 import os
 
 import ffmpeg
-from log_config import get_logger
-from settings import get_rtsp_settings
+
+from nomad.log_config import get_logger
+from nomad.settings import get_rtsp_settings
 
 logger = get_logger(__name__)
 

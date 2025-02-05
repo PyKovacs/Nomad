@@ -14,9 +14,8 @@ venv
 
 .env
 
-test*.png
+*.png
 *.log
 
-
-app/snapshots/*.png
-app/models/*
+nomad/snapshots/*.png
+nomad/models/*

@@ -1,13 +1,18 @@
 import asyncio
 
-from log_config import get_logger
-from settings import get_telegram_bot_settings
 from telegram import Bot
+
+from nomad.log_config import get_logger
+from nomad.settings import get_telegram_bot_settings
 
 logger = get_logger(__name__)
 
 bot_settings = get_telegram_bot_settings()
 bot = Bot(token=bot_settings.token)
+
+### TODO - resolve Event loop is closed error (https://docs.python.org/3.11/library/asyncio-eventloop.html#asyncio.loop.run_in_executor)
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(bot.set_webhook(url="https://example.com/"))
 
 
 async def send_message_and_snapshot(chat_id: int, text: str, snapshot_file: str) -> None:
