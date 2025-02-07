@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 from time import sleep
@@ -7,6 +8,7 @@ from ultralytics import YOLO
 
 from nomad.log_config import get_logger
 from nomad.modules import capture, detect, notify
+from nomad.standby import get_standby_from_to
 
 logger = get_logger(__name__)
 
@@ -38,7 +40,26 @@ def main():
 
     previous_detected_objects_count = 0
     loop = asyncio.get_event_loop()
+    standby_update_ts = datetime.now(tz=timezone.utc)
+    standby_from, standby_to = get_standby_from_to()
     while True:
+        # runs once per day
+        if standby_update_ts + timedelta(days=1) < datetime.now(tz=timezone.utc):
+            print("Updating standby time")
+            standby_update_ts = datetime.now()
+            standby_from, standby_to = get_standby_from_to()
+        print(standby_from.strftime("%H:%M:%S %d-%m-%Y"))
+        print(standby_from.tzinfo)
+        print(standby_to.strftime("%H:%M:%S %d-%m-%Y"))
+        print(standby_to.tzinfo)
+        print(datetime.now(tz=timezone.utc).strftime("%H:%M:%S %d-%m-%Y"))
+        teraz = datetime.now(tz=timezone.utc) - timedelta(hours=1)
+
+        if standby_from.time() <= teraz.time() <= standby_to.time():
+            print("Standby time")
+            sleep(60)
+            continue
+
         capture.capture_frame(SNAPSHOTS_PATH)
         detected_objects_count = detect.detect_objects(SNAPSHOTS_PATH, OD_MODEL, ACTIVE_DETECTION_TYPE.value)
         if detected_objects_count != previous_detected_objects_count:

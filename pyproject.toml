@@ -5,6 +5,7 @@ description = "Capture, detect and notify from camera live feed."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "astral>=3.2",
     "ffmpeg-python>=0.2.0",
     "pydantic-settings>=2.7.1",
     "python-telegram-bot>=21.10",
