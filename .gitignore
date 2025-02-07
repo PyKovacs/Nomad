@@ -17,5 +17,8 @@ venv
 *.png
 *.log
 
+logs/*
+
 nomad/snapshots/*.png
 nomad/models/*
+nomad/logs/*
