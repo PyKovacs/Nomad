@@ -11,7 +11,6 @@ def detect_objects(snapshot_filename: str, model: YOLO, object_class: int) -> in
 
     object_class: 2 for cars
     """
-    logger.info(f"Detecting objects in {snapshot_filename}")
     results = model(snapshot_filename)  # YOLO inference
     detections = results[0].boxes
     detected_objects_count = len([obj for obj in detections if obj.cls == object_class])

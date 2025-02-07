@@ -35,7 +35,6 @@ def main():
     previous_detected_objects_count = 0
     loop = asyncio.get_event_loop()
     while True:
-        logger.info("----->  Main loop iteration started")
         capture.capture_frame(FILE_PATH)
         detected_objects_count = detect.detect_objects(FILE_PATH, OD_MODEL, ACTIVE_DETECTION_TYPE.value)
         if detected_objects_count != previous_detected_objects_count:
@@ -44,7 +43,6 @@ def main():
             )
         previous_detected_objects_count = detected_objects_count
         sleep(DETECTION_DELAY_SECONDS)
-        logger.info("----->  Main loop iteration completed")
 
 
 if __name__ == "__main__":
