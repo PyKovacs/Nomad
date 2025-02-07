@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ultralytics import YOLO
 
 from nomad.log_config import get_logger
@@ -5,7 +7,7 @@ from nomad.log_config import get_logger
 logger = get_logger(__name__)
 
 
-def detect_objects(snapshot_filename: str, model: YOLO, object_class: int) -> int:
+def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> int:
     """
     Detect objects in a snapshot and return the number of detected objects of a certain class.
 

@@ -1,6 +1,6 @@
 [project]
 name = "nomad"
-version = "0.2.0"
+version = "0.2.1"
 description = "Capture, detect and notify from camera live feed."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,11 +13,11 @@ dependencies = [
 
 [tool.setuptools]
 py-modules = []
-packages = ["nomad"]
+packages = ["nomad", "nomad.modules"]
 
 [project.scripts]
 nomad = "nomad.__main__:main"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"

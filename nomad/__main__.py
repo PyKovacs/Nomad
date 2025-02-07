@@ -1,5 +1,6 @@
 import asyncio
 from enum import Enum
+from pathlib import Path
 from time import sleep
 
 from ultralytics import YOLO
@@ -9,8 +10,11 @@ from nomad.modules import capture, detect, notify
 
 logger = get_logger(__name__)
 
-FILE_PATH = "snapshots/current.png"
-OD_MODEL = YOLO("models/yolov8n.pt")
+APP_DIR = Path.home() / "nomad"
+SNAPSHOTS_PATH = APP_DIR / "snapshots" / "current.png"
+MODEL_PATH = APP_DIR / "models" / "yolov8n.pt"
+
+OD_MODEL = YOLO(MODEL_PATH)
 DETECTION_DELAY_SECONDS = 5
 
 
@@ -25,7 +29,7 @@ ACTIVE_DETECTION_TYPE = DetectionType.CAR
 def main():
     logger.info("")
     logger.info("################################## NOMAD ##################################")
-    logger.info(f"# Snapshot will be saved to: {FILE_PATH:>43}  #")
+    logger.info(f"# Snapshot will be saved to: {str(SNAPSHOTS_PATH):>43}  #")
     logger.info(f"# Object detection model: {OD_MODEL.model_name:>46}  #")
     logger.info(f"# Frame capture delay: {DETECTION_DELAY_SECONDS:>41} seconds  #")
     logger.info(f"# Active detection type: {ACTIVE_DETECTION_TYPE.name:>47}  #")
@@ -35,11 +39,11 @@ def main():
     previous_detected_objects_count = 0
     loop = asyncio.get_event_loop()
     while True:
-        capture.capture_frame(FILE_PATH)
-        detected_objects_count = detect.detect_objects(FILE_PATH, OD_MODEL, ACTIVE_DETECTION_TYPE.value)
+        capture.capture_frame(SNAPSHOTS_PATH)
+        detected_objects_count = detect.detect_objects(SNAPSHOTS_PATH, OD_MODEL, ACTIVE_DETECTION_TYPE.value)
         if detected_objects_count != previous_detected_objects_count:
             notify.send_notification(
-                detected_objects_count, ACTIVE_DETECTION_TYPE.name, FILE_PATH, event_loop=loop
+                detected_objects_count, ACTIVE_DETECTION_TYPE.name, SNAPSHOTS_PATH, event_loop=loop
             )
         previous_detected_objects_count = detected_objects_count
         sleep(DETECTION_DELAY_SECONDS)
