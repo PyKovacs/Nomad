@@ -22,3 +22,6 @@ logs/*
 nomad/snapshots/*.png
 nomad/models/*
 nomad/logs/*
+
+# MAC
+.DS_Store

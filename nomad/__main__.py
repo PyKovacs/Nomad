@@ -3,19 +3,20 @@ from enum import Enum
 from pathlib import Path
 from time import sleep
 
+import ffmpeg
 from ultralytics import YOLO
 
 from nomad.log_config import get_logger
 from nomad.modules import capture, detect, notify
+from nomad.settings import get_rtsp_settings
+
+settings = get_rtsp_settings()
 
 logger = get_logger(__name__)
 
 APP_DIR = Path.home() / "nomad"
 SNAPSHOTS_PATH = APP_DIR / "snapshots" / "current.png"
 MODEL_PATH = APP_DIR / "models" / "yolov8n.pt"
-
-OD_MODEL = YOLO(MODEL_PATH)
-DETECTION_DELAY_SECONDS = 5
 
 
 class DetectionType(Enum):
@@ -29,24 +30,48 @@ ACTIVE_DETECTION_TYPE = DetectionType.CAR
 def main():
     logger.info("")
     logger.info("################################## NOMAD ##################################")
-    logger.info(f"# Snapshot will be saved to: {str(SNAPSHOTS_PATH):>43}  #")
-    logger.info(f"# Object detection model: {OD_MODEL.model_name:>46}  #")
-    logger.info(f"# Frame capture delay: {DETECTION_DELAY_SECONDS:>41} seconds  #")
+    logger.info(f"# Snapshot path: {str(SNAPSHOTS_PATH):>55}  #")
+    logger.info(f"# OD model path: {str(MODEL_PATH):>55}  #")
+    logger.info(f"# Frame capture delay: {settings.detection_delay_seconds:>41} seconds  #")
     logger.info(f"# Active detection type: {ACTIVE_DETECTION_TYPE.name:>47}  #")
     logger.info("###########################################################################")
     logger.info("")
 
+    ### loading variables
     previous_detected_objects_count = 0
+    frame_capture_failures = 0
+    streaming = ffmpeg.input(settings.url, rtsp_transport="tcp", probesize="5000000", analyzeduration="10000000")
+    od_model = YOLO(MODEL_PATH)
     loop = asyncio.get_event_loop()
+
+    ### main loop
     while True:
-        capture.capture_frame(SNAPSHOTS_PATH)
-        detected_objects_count = detect.detect_objects(SNAPSHOTS_PATH, OD_MODEL, ACTIVE_DETECTION_TYPE.value)
+        frame_captured = capture.capture_frame(SNAPSHOTS_PATH, streaming)
+
+        ### frame capture failure handling
+        if not frame_captured:
+            if frame_capture_failures > 20:
+                logger.error("Failed to capture a frame too many times, exiting...")
+                break
+            frame_capture_failures += 1
+            logger.error("Failed to capture a frame, sleeping for 30 seconds...")
+            sleep(30)
+            del streaming
+            streaming = ffmpeg.input(
+                settings.url,
+                rtsp_transport="tcp",
+                probesize="5000000",
+                analyzeduration="10000000",
+            )
+            continue
+
+        detected_objects_count = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
         if detected_objects_count != previous_detected_objects_count:
             notify.send_notification(
                 detected_objects_count, ACTIVE_DETECTION_TYPE.name, SNAPSHOTS_PATH, event_loop=loop
             )
         previous_detected_objects_count = detected_objects_count
-        sleep(DETECTION_DELAY_SECONDS)
+        sleep(settings.detection_delay_seconds)
 
 
 if __name__ == "__main__":

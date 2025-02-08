@@ -16,6 +16,7 @@ class TelegramBotSettings(BaseSettings):
 
 class RTSPSettings(BaseSettings):
     url: str
+    detection_delay_seconds: int = 5
 
     model_config = SettingsConfigDict(env_file=".env", extra="allow", env_prefix="RTSP_")
 
