@@ -64,6 +64,7 @@ def main():
                 analyzeduration="10000000",
             )
             continue
+        frame_capture_failures = 0
 
         objects_detected_now = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
         if objects_detected_now is not objects_detected_before:
