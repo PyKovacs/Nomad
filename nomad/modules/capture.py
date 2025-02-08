@@ -25,7 +25,6 @@ def check_url(host: str, port: int = 554, timeout: int = 5) -> bool:
     Check if an RTSP connection can be established to the given host and port.
     """
     try:
-        print(host, port, timeout)
         with socket.create_connection((host, port), timeout=timeout):
             return True
     except (socket.timeout, socket.error):
