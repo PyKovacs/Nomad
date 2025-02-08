@@ -38,7 +38,7 @@ def main():
     logger.info("")
 
     ### loading variables
-    previous_detected_objects_count = 0
+    objects_detected_before = False
     frame_capture_failures = 0
     streaming = ffmpeg.input(settings.url, rtsp_transport="tcp", probesize="5000000", analyzeduration="10000000")
     od_model = YOLO(MODEL_PATH)
@@ -65,12 +65,10 @@ def main():
             )
             continue
 
-        detected_objects_count = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
-        if detected_objects_count != previous_detected_objects_count:
-            notify.send_notification(
-                detected_objects_count, ACTIVE_DETECTION_TYPE.name, SNAPSHOTS_PATH, event_loop=loop
-            )
-        previous_detected_objects_count = detected_objects_count
+        objects_detected_now = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
+        if objects_detected_now is not objects_detected_before:
+            notify.send_notification(ACTIVE_DETECTION_TYPE.name, SNAPSHOTS_PATH, event_loop=loop)
+        objects_detected_before = objects_detected_now
         sleep(settings.detection_delay_seconds)
 
 

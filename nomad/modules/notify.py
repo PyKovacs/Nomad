@@ -21,7 +21,6 @@ async def send_message_and_snapshot(chat_id: int, text: str, snapshot_file: str 
 
 
 def send_notification(
-    detected_objects_count: int,
     active_detection_type_name: str,
     snapshot_file: str | Path,
     event_loop: asyncio.AbstractEventLoop,
@@ -29,8 +28,7 @@ def send_notification(
     """
     Send a notification with the number of detected objects and a snapshot to all chat ids.
     """
-    logger.info(f"Sending a notification with {detected_objects_count} detected objects")
-    message = f"{detected_objects_count} {active_detection_type_name.lower()}{'' if detected_objects_count == 1 else 's'} detected!"
+    message = f"{active_detection_type_name.capitalize()} detected!"
     for chat_id in bot_settings.chat_ids:
         logger.info(f"Sending a notification to chat ID: {chat_id}")
         event_loop.run_until_complete(send_message_and_snapshot(chat_id, message, snapshot_file))

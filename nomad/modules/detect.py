@@ -7,9 +7,9 @@ from nomad.log_config import get_logger
 logger = get_logger(__name__)
 
 
-def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> int:
+def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> bool:
     """
-    Detect objects in a snapshot and return the number of detected objects of a certain class.
+    Detect objects in a snapshot and return True if the specified object class is detected
 
     object_class: 2 for cars
     """
@@ -17,4 +17,4 @@ def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int
     detections = results[0].boxes
     detected_objects_count = len([obj for obj in detections if obj.cls == object_class])
     logger.info(f"{detected_objects_count} object(s) detected")
-    return detected_objects_count
+    return bool(detected_objects_count)
