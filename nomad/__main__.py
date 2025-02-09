@@ -68,7 +68,12 @@ def main():
 
         objects_detected_now = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
         if objects_detected_now is not objects_detected_before:
-            notify.send_notification(ACTIVE_DETECTION_TYPE.name, SNAPSHOTS_PATH, event_loop=loop)
+            notify.send_notification(
+                detection_positive=objects_detected_now,
+                active_detection_type_name=ACTIVE_DETECTION_TYPE.name,
+                snapshot_file=SNAPSHOTS_PATH,
+                event_loop=loop,
+            )
         objects_detected_before = objects_detected_now
         sleep(settings.detection_delay_seconds)
 
