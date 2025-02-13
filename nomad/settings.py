@@ -24,10 +24,18 @@ class RTSPSettings(BaseSettings):
 @cache
 def get_telegram_bot_settings() -> TelegramBotSettings:
     logger.info("Loading Telegram bot settings")
-    return TelegramBotSettings()
+    try:
+        return TelegramBotSettings()
+    except Exception as e:
+        logger.error(f"Failed to load Telegram bot settings: {e}")
+        raise e
 
 
 @cache
 def get_rtsp_settings() -> RTSPSettings:
     logger.info("Loading RTSP settings")
-    return RTSPSettings()
+    try:
+        return RTSPSettings()
+    except Exception as e:
+        logger.error(f"Failed to load RTSP settings: {e}")
+        raise e
