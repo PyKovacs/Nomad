@@ -29,8 +29,8 @@ def send_notification(
     """
     Send a notification with the number of detected objects and a snapshot to all chat ids.
     """
-    message = f"{active_detection_type_name.capitalize()} detected!"
-    if detection_positive:
+    message = f"{active_detection_type_name} DETECTED!"
+    if not detection_positive:
         message = "aaaand is gone..."
     for chat_id in bot_settings.chat_ids:
         logger.info(f"Sending a notification to chat ID: {chat_id}")
