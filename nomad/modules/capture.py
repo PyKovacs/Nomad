@@ -48,7 +48,9 @@ def capture_frame(file_path: str | Path, streaming: Any) -> bool:
             os.remove(file_path)
 
         # Capture a single frame with '-update 1'
-        stream = streaming.output(str(file_path), vframes=1, format="image2", pix_fmt="rgb24")
+        stream = streaming.output(
+            str(file_path), vframes=1, format="image2", pix_fmt="rgb24", update=1, vf="crop=640:250:220:270"
+        )
         stream.run(capture_stdout=True, capture_stderr=True)
         return True
 
