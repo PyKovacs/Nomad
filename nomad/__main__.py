@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 
 APP_DIR = Path.home() / "nomad"
 SNAPSHOTS_PATH = APP_DIR / "snapshots" / "current.png"
-MODEL_PATH = APP_DIR / "models" / "yolov8n.pt"
+MODEL_PATH = APP_DIR / "models" / "yolov8m.pt"
 
 
 class DetectionType(Enum):
