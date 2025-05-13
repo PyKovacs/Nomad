@@ -8,15 +8,16 @@ from ultralytics import YOLO
 
 from nomad.log_config import get_logger
 from nomad.modules import capture, detect, notify
-from nomad.settings import get_rtsp_settings
+from nomad.settings import get_rtsp_settings, get_yolo_model_settings
 
-settings = get_rtsp_settings()
+rtsp_settings = get_rtsp_settings()
+yolo_settings = get_yolo_model_settings()
 
 logger = get_logger(__name__)
 
 APP_DIR = Path.home() / "nomad"
 SNAPSHOTS_PATH = APP_DIR / "snapshots" / "current.png"
-MODEL_PATH = APP_DIR / "models" / "yolov8m.pt"
+MODEL_PATH = APP_DIR / "models" / yolo_settings.model_name
 
 
 class DetectionType(Enum):
@@ -32,7 +33,7 @@ def main():
     logger.info("################################## NOMAD ##################################")
     logger.info(f"# Snapshot path: {str(SNAPSHOTS_PATH):>55}  #")
     logger.info(f"# OD model path: {str(MODEL_PATH):>55}  #")
-    logger.info(f"# Frame capture delay: {settings.detection_delay_seconds:>41} seconds  #")
+    logger.info(f"# Frame capture delay: {rtsp_settings.detection_delay_seconds:>41} seconds  #")
     logger.info(f"# Active detection type: {ACTIVE_DETECTION_TYPE.name:>47}  #")
     logger.info("###########################################################################")
     logger.info("")
@@ -40,7 +41,9 @@ def main():
     ### loading variables
     objects_detected_before = False
     frame_capture_failures = 0
-    streaming = ffmpeg.input(settings.url, rtsp_transport="tcp", probesize="5000000", analyzeduration="10000000")
+    streaming = ffmpeg.input(
+        rtsp_settings.url, rtsp_transport="tcp", probesize="5000000", analyzeduration="10000000"
+    )
     od_model = YOLO(MODEL_PATH)
     loop = asyncio.get_event_loop()
 
@@ -58,7 +61,7 @@ def main():
             sleep(30)
             del streaming
             streaming = ffmpeg.input(
-                settings.url,
+                rtsp_settings.url,
                 rtsp_transport="tcp",
                 probesize="5000000",
                 analyzeduration="10000000",
@@ -75,7 +78,7 @@ def main():
                 event_loop=loop,
             )
         objects_detected_before = objects_detected_now
-        sleep(settings.detection_delay_seconds)
+        sleep(rtsp_settings.detection_delay_seconds)
 
 
 if __name__ == "__main__":
