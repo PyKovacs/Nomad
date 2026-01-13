@@ -1,5 +1,3 @@
-from functools import cache
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from nomad.log_config import get_logger
@@ -11,47 +9,23 @@ class TelegramBotSettings(BaseSettings):
     token: str
     chat_ids: list[int]
 
-    model_config = SettingsConfigDict(env_file=".env", extra="allow", env_prefix="TELEGRAM_BOT_")
+    model_config = SettingsConfigDict(
+        env_file=".env", extra="allow", env_prefix="TELEGRAM_BOT_"
+    )
 
 
 class RTSPSettings(BaseSettings):
     url: str
     detection_delay_seconds: int = 5
 
-    model_config = SettingsConfigDict(env_file=".env", extra="allow", env_prefix="RTSP_")
+    model_config = SettingsConfigDict(
+        env_file=".env", extra="allow", env_prefix="RTSP_"
+    )
 
 
 class YOLOModelSettings(BaseSettings):
     model_name: str = "yolov8m.pt"
     confidence: float = 0.7
-    model_config = SettingsConfigDict(env_file=".env", extra="allow", env_prefix="YOLO_")
-
-
-@cache
-def get_telegram_bot_settings() -> TelegramBotSettings:
-    logger.info("Loading Telegram bot settings")
-    try:
-        return TelegramBotSettings()
-    except Exception as e:
-        logger.error(f"Failed to load Telegram bot settings: {e}")
-        raise e
-
-
-@cache
-def get_rtsp_settings() -> RTSPSettings:
-    logger.info("Loading RTSP settings")
-    try:
-        return RTSPSettings()
-    except Exception as e:
-        logger.error(f"Failed to load RTSP settings: {e}")
-        raise e
-
-
-@cache
-def get_yolo_model_settings() -> YOLOModelSettings:
-    logger.info("Loading YOLO model settings")
-    try:
-        return YOLOModelSettings()
-    except Exception as e:
-        logger.error(f"Failed to load YOLO model settings: {e}")
-        raise e
+    model_config = SettingsConfigDict(
+        env_file=".env", extra="allow", env_prefix="YOLO_"
+    )

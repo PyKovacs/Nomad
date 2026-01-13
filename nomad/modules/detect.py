@@ -3,9 +3,10 @@ from pathlib import Path
 from ultralytics import YOLO
 
 from nomad.log_config import get_logger
-from nomad.settings import get_yolo_model_settings
+from nomad.settings import YOLOModelSettings
 
 logger = get_logger(__name__)
+settings = YOLOModelSettings()
 
 
 def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> bool:
@@ -14,7 +15,7 @@ def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int
 
     object_class: 2 for cars
     """
-    results = model(snapshot_filename, conf=get_yolo_model_settings().confidence)  # YOLO inference
+    results = model(snapshot_filename, conf=settings.confidence)  # YOLO inference
     detections = results[0].boxes
     detected_objects_count = len([obj for obj in detections if obj.cls == object_class])
     logger.info(f"{detected_objects_count} object(s) detected")

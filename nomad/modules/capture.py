@@ -6,11 +6,11 @@ from typing import Any
 import ffmpeg
 
 from nomad.log_config import get_logger
-from nomad.settings import get_rtsp_settings
+from nomad.settings import RTSPSettings
 
 logger = get_logger(__name__)
 
-settings = get_rtsp_settings()
+settings = RTSPSettings()
 
 
 def get_hostname(url: str) -> str:
@@ -49,7 +49,12 @@ def capture_frame(file_path: str | Path, streaming: Any) -> bool:
 
         # Capture a single frame with '-update 1'
         stream = streaming.output(
-            str(file_path), vframes=1, format="image2", pix_fmt="rgb24", update=1, vf="crop=640:250:220:270"
+            str(file_path),
+            vframes=1,
+            format="image2",
+            pix_fmt="rgb24",
+            update=1,
+            vf="crop=640:250:220:270",
         )
         stream.run(capture_stdout=True, capture_stderr=True)
         return True

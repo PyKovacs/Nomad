@@ -4,11 +4,11 @@ from pathlib import Path
 from telegram import Bot
 
 from nomad.log_config import get_logger
-from nomad.settings import get_telegram_bot_settings
+from nomad.settings import TelegramBotSettings
 
 logger = get_logger(__name__)
 
-bot_settings = get_telegram_bot_settings()
+bot_settings = TelegramBotSettings()
 bot = Bot(token=bot_settings.token)
 
 
