@@ -38,23 +38,26 @@ def log_init_info():
     logger.info("")
 
 
-def run_session():
-    log_init_info()
-
-    objects_detected_before = False
-    frame_capture_failures = 0
-    streaming = ffmpeg.input(
+def get_streaming():
+    return ffmpeg.input(
         rtsp_settings.url,
         rtsp_transport="tcp",
         probesize="5000000",
         analyzeduration="10000000",
     )
+
+
+def run_session():
+    log_init_info()
+
+    objects_detected_before = False
+    frame_capture_failures = 0
     od_model = YOLO(MODEL_PATH)
     loop = asyncio.get_event_loop()
 
     ### main loop
     while True:
-        frame_captured = capture.capture_frame(SNAPSHOTS_PATH, streaming)
+        frame_captured = capture.capture_frame(SNAPSHOTS_PATH, get_streaming())
 
         ### frame capture failure handling
         if not frame_captured:
@@ -64,13 +67,6 @@ def run_session():
             frame_capture_failures += 1
             logger.error("Failed to capture a frame, sleeping for 30 seconds...")
             sleep(30)
-            del streaming
-            streaming = ffmpeg.input(
-                rtsp_settings.url,
-                rtsp_transport="tcp",
-                probesize="5000000",
-                analyzeduration="10000000",
-            )
             continue
         frame_capture_failures = 0
 
