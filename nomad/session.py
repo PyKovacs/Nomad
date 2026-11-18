@@ -18,8 +18,12 @@ class DetectionType(Enum):
     # Add more detection types here if needed
 
 
+# BOT_SUSPENDED enables or disables the notifications
 BOT_SUSPENDED = [False]
+# OBJECT_COUNT_AWARENESS enables or disables notifications on CHANGED count of detected objects
 OBJECT_COUNT_AWARENESS = [False]
+# IGNORE_COUNT sets the threshold for notifications, if set to 1, detections of 1 object will not trigger a notification
+IGNORE_COUNT = [0]
 ACTIVE_DETECTION_TYPE = DetectionType.CAR
 APP_DIR = Path.home() / "nomad"
 SNAPSHOTS_PATH = APP_DIR / "snapshots"
@@ -70,9 +74,11 @@ async def run_session():
             continue
         frame_capture_failures = 0
 
-        objects_detected_now = detect.detect_objects(
-            SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value
+        objects_detected_now = (
+            detect.detect_objects(SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value)
+            - IGNORE_COUNT[0]
         )
+
         if OBJECT_COUNT_AWARENESS[0] and objects_detected_now != objects_detected_before and not BOT_SUSPENDED[0]:
             await notify.send_notification(
                 detection_positive=objects_detected_now,

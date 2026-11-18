@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from nomad.log_config import get_logger
-from nomad.session import BOT_SUSPENDED, OBJECT_COUNT_AWARENESS, SNAPSHOTS_PATH
+from nomad.session import BOT_SUSPENDED, IGNORE_COUNT, OBJECT_COUNT_AWARENESS, SNAPSHOTS_PATH
 from nomad.settings import TelegramBotSettings
 
 logger = get_logger(__name__)
@@ -37,6 +37,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         OBJECT_COUNT_AWARENESS[0] = False
         await update.message.reply_text("object count awareness disabled")
         logger.info("Object count awareness disabled")
+
+    elif "set ignore" in text:
+        ignore_value = text[-1]
+        if not ignore_value.isdigit() and 0 < int(ignore_value) < 10:
+            await update.message.reply_text("Ignore value invalid.")
+            logger.info(f"Ignore value invalid: {ignore_value}")
+        IGNORE_COUNT[0] = ignore_value
+        await update.message.reply_text(f"ignore value set to {ignore_value}")
+        logger.info(f"Ignore value set to {ignore_value}")
 
     else:
         await update.message.reply_text("what?")
