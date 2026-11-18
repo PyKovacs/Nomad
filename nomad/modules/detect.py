@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 settings = YOLOModelSettings()
 
 
-def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> bool:
+def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int) -> int:
     """
     Detect objects in a snapshot and return True if the specified object class is detected
 
@@ -19,4 +19,4 @@ def detect_objects(snapshot_filename: str | Path, model: YOLO, object_class: int
     detections = results[0].boxes
     detected_objects_count = len([obj for obj in detections if obj.cls == object_class])
     logger.info(f"{detected_objects_count} object(s) detected")
-    return bool(detected_objects_count)
+    return detected_objects_count

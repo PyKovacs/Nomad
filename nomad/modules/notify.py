@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 from telegram import Bot
@@ -25,19 +24,7 @@ def anti_flood() -> bool:
     return len(messages) >= 2
 
 
-async def send_message_and_snapshot(chat_id: int, text: str, snapshot_file: str | Path) -> None:
-    """
-    Send a snapshot to a chat.
-    """
-    await bot.send_photo(chat_id=chat_id, photo=snapshot_file, caption=text)
-
-
-def send_notification(
-    detection_positive: bool,
-    active_detection_type_name: str,
-    snapshot_file: str | Path,
-    event_loop: asyncio.AbstractEventLoop,
-) -> None:
+async def send_notification(detection_positive: bool, snapshot_file: str | Path, message: str) -> None:
     """
     Send a notification with the number of detected objects and a snapshot to all chat ids.
     """
@@ -45,9 +32,8 @@ def send_notification(
         logger.warning("ANTI-FLOOD triggered, skipping notification")
         return
 
-    message = f"{active_detection_type_name} DETECTED!"
     if not detection_positive:
         message = "aaaand is gone..."
     logger.info(f"Sending notifications to chat ids: {bot_settings.chat_ids}")
     for chat_id in bot_settings.chat_ids:
-        event_loop.run_until_complete(send_message_and_snapshot(chat_id, message, snapshot_file))
+        await bot.send_photo(chat_id=chat_id, photo=snapshot_file, caption=message)

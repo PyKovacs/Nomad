@@ -1,7 +1,6 @@
 import asyncio
 from enum import Enum
 from pathlib import Path
-from time import sleep
 
 import ffmpeg
 from ultralytics import YOLO
@@ -19,15 +18,17 @@ class DetectionType(Enum):
     # Add more detection types here if needed
 
 
+BOT_SUSPENDED = [False]
+OBJECT_COUNT_AWARENESS = [False]
 ACTIVE_DETECTION_TYPE = DetectionType.CAR
 APP_DIR = Path.home() / "nomad"
-SNAPSHOTS_PATH = APP_DIR / "snapshots" / "current.png"
+SNAPSHOTS_PATH = APP_DIR / "snapshots"
 MODEL_PATH = APP_DIR / "models" / yolo_settings.model_name
 
 logger = get_logger(__name__)
 
 
-def log_init_info():
+def log_init_info() -> None:
     logger.info("")
     logger.info("################################## NOMAD ##################################")
     logger.info(f"# Snapshot path: {str(SNAPSHOTS_PATH):>55}  #")
@@ -47,17 +48,16 @@ def get_streaming():
     )
 
 
-def run_session():
+async def run_session():
     log_init_info()
 
-    objects_detected_before = False
+    objects_detected_before = 0
     frame_capture_failures = 0
     od_model = YOLO(MODEL_PATH)
-    loop = asyncio.get_event_loop()
 
     ### main loop
     while True:
-        frame_captured = capture.capture_frame(SNAPSHOTS_PATH, get_streaming())
+        frame_captured = await asyncio.to_thread(capture.capture_frame, SNAPSHOTS_PATH, get_streaming())
 
         ### frame capture failure handling
         if not frame_captured:
@@ -66,17 +66,26 @@ def run_session():
                 break
             frame_capture_failures += 1
             logger.error("Failed to capture a frame, sleeping for 30 seconds...")
-            sleep(30)
+            await asyncio.sleep(30)
             continue
         frame_capture_failures = 0
 
-        objects_detected_now = detect.detect_objects(SNAPSHOTS_PATH, od_model, ACTIVE_DETECTION_TYPE.value)
-        if objects_detected_now is not objects_detected_before:
-            notify.send_notification(
+        objects_detected_now = detect.detect_objects(
+            SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value
+        )
+        if OBJECT_COUNT_AWARENESS and objects_detected_now != objects_detected_before and not BOT_SUSPENDED[0]:
+            await notify.send_notification(
                 detection_positive=objects_detected_now,
-                active_detection_type_name=ACTIVE_DETECTION_TYPE.name,
-                snapshot_file=SNAPSHOTS_PATH,
-                event_loop=loop,
+                snapshot_file=SNAPSHOTS_PATH / "current.png",
+                message=f"{objects_detected_now} {ACTIVE_DETECTION_TYPE.name}(s) detected!",
             )
+
+        if bool(objects_detected_now) is not bool(objects_detected_before) and not BOT_SUSPENDED[0]:
+            await notify.send_notification(
+                detection_positive=objects_detected_now,
+                snapshot_file=SNAPSHOTS_PATH / "current.png",
+                message=f"{ACTIVE_DETECTION_TYPE.name}(s) detected!",
+            )
+
         objects_detected_before = objects_detected_now
-        sleep(rtsp_settings.detection_delay_seconds)
+        await asyncio.sleep(rtsp_settings.detection_delay_seconds)
