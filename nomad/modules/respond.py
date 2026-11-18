@@ -44,7 +44,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("Ignore value invalid.")
             logger.info(f"Ignore value invalid: {ignore_value}")
             return
-        IGNORE_COUNT[0] = ignore_value
+        IGNORE_COUNT[0] = int(ignore_value)
         await update.message.reply_text(f"ignore value set to {ignore_value}")
         logger.info(f"Ignore value set to {ignore_value}")
 
