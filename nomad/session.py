@@ -74,10 +74,11 @@ async def run_session():
             continue
         frame_capture_failures = 0
 
-        objects_detected_now = (
-            detect.detect_objects(SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value)
-            - IGNORE_COUNT[0]
+        objects_detected_now = detect.detect_objects(
+            SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value
         )
+        if objects_detected_now >= IGNORE_COUNT[0]:
+            objects_detected_now -= IGNORE_COUNT[0]
 
         if OBJECT_COUNT_AWARENESS[0] and objects_detected_now != objects_detected_before and not BOT_SUSPENDED[0]:
             await notify.send_notification(
