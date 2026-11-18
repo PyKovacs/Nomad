@@ -33,5 +33,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("object count awareness enabled")
         logger.info("Object count awareness enabled")
 
+    elif text == "unset counter":
+        OBJECT_COUNT_AWARENESS[0] = False
+        await update.message.reply_text("object count awareness disabled")
+        logger.info("Object count awareness disabled")
+
     else:
         await update.message.reply_text("what?")
