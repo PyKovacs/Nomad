@@ -73,7 +73,7 @@ async def run_session():
         objects_detected_now = detect.detect_objects(
             SNAPSHOTS_PATH / "current.png", od_model, ACTIVE_DETECTION_TYPE.value
         )
-        if OBJECT_COUNT_AWARENESS and objects_detected_now != objects_detected_before and not BOT_SUSPENDED[0]:
+        if OBJECT_COUNT_AWARENESS[0] and objects_detected_now != objects_detected_before and not BOT_SUSPENDED[0]:
             await notify.send_notification(
                 detection_positive=objects_detected_now,
                 snapshot_file=SNAPSHOTS_PATH / "current.png",
