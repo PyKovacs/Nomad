@@ -87,7 +87,7 @@ async def run_session():
                 message=f"{objects_detected_now} {ACTIVE_DETECTION_TYPE.name}(s) detected!",
             )
 
-        if bool(objects_detected_now) is not bool(objects_detected_before) and not BOT_SUSPENDED[0]:
+        elif bool(objects_detected_now) is not bool(objects_detected_before) and not BOT_SUSPENDED[0]:
             await notify.send_notification(
                 detection_positive=objects_detected_now,
                 snapshot_file=SNAPSHOTS_PATH / "current.png",

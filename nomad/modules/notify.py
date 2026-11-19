@@ -14,14 +14,14 @@ bot = Bot(token=bot_settings.token)
 def anti_flood() -> bool:
     """
     Check the number of messages sent in the n most recent lines of the log file.
-    Returns True if the number of messages is more than 2, otherwise False.
+    Returns True if the number of messages is more than 4, otherwise False.
     """
     most_recent_lines = 120  # new line every approx. 5 seconds; 5 * 120 = 600 seconds = 10 minutes
     log_file = logger.handlers[0].baseFilename  # type: ignore
     with open(log_file, "r") as f:
         lines = f.readlines()[-most_recent_lines:]
     messages = [line for line in lines if "Sending notifications to chat ids" in line]
-    return len(messages) >= 2
+    return len(messages) >= 4
 
 
 async def send_notification(detection_positive: bool, snapshot_file: str | Path, message: str) -> None:
@@ -33,7 +33,7 @@ async def send_notification(detection_positive: bool, snapshot_file: str | Path,
         return
 
     if not detection_positive:
-        message = "aaaand is gone..."
+        message = "clear"
     logger.info(f"Sending notifications to chat ids: {bot_settings.chat_ids}")
     for chat_id in bot_settings.chat_ids:
         await bot.send_photo(chat_id=chat_id, photo=snapshot_file, caption=message)
